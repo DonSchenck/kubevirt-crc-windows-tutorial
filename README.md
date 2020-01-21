@@ -3,10 +3,10 @@ Running a Window Framework (NOT .NET Core) app on Kubernetes using CodeReady Con
 
 This tutorial will guide you through the process of getting kubevirt running inside of OpenShift, and then using kubevirt to host a Windows VM in OpenShift. That Windows VM will be running an IIS-powered web site and a .NET Framework WCF service application.
 
-## Glossary
-VM: Virtual Machine  
-CRC: CodeReady Containers  
+## Glossary/Acronyms
 CLI: Command-Line Interface  
+CRC: CodeReady Containers  
+VM: Virtual Machine  
 
 ## Prerequisites
 CodeReady Containers  
@@ -39,23 +39,21 @@ After CRC has started, there is no reason (yet) to sign in. Immediately stop CRC
 `crc stop`
 
 ### Resize
-Now, add 70GB to the VM:
-`export CRC_MACHINE_IMAGE=${HOME}/.crc/machines/crc/crc`  
-
-`qemu-img resize ${CRC_MACHINE_IMAGE} +70G`  
-
-`cp ${CRC_MACHINE_IMAGE} ${CRC_MACHINE_IMAGE}.ORIGINAL`  
-
-`virt-resize --expand /dev/sda3 ${CRC_MACHINE_IMAGE}.ORIGINAL ${CRC_MACHINE_IMAGE}`  
-
-`rm ${CRC_MACHINE_IMAGE}.ORIGINAL`  
+Now, add 70GB to the VM by running the makebig script:  
+`./makebig.sh`
 
 
 
 ### Start
-Now we can start CRC and proceed with the tutorial.
+Now we can start CRC and proceed with the tutorial.  
+`crc start`
 
-## Install kubevirt
+## Install kubevirt Operator  
+This first part will get the current version number (e.g. 0.25.0) into an environment variable.  
+export KUBEVIRT_VERSION=$(curl -s https://api.github.com/repos/kubevirt/kubevirt/releases/latest | jq -r .tag_name)  
+echo $KUBEVIRT_VERSION  
+
+kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-operator.yaml
 
 ## Install CDI
 
