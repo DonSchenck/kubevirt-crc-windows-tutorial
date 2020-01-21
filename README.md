@@ -31,6 +31,7 @@ Make sure the VM has enough RAM in order to keep performance acceptable. More is
 
 
 ### Start in order to be a VM
+
 `crc start`
 
 ### Stop
@@ -39,29 +40,70 @@ After CRC has started, there is no reason (yet) to sign in. Immediately stop CRC
 `crc stop`
 
 ### Resize
-Now, add 70GB to the VM by running the makebig script:  
+Now, add 75GB to the VM by running the makebig script:  
+
 `./makebig.sh`
 
 
 
 ### Start
 Now we can start CRC and proceed with the tutorial.  
-`crc start`
+
+`crc start`  
+
+That will supply you with the proper login information. Log in and set your operating environment.
+
+`oc login -u kubeadmin -p your_password_goes_here https://api.crc.testing:6443`  
+
+`eval (crc oc-env)`  
 
 ## Install kubevirt Operator  
 This first part will get the current version number (e.g. 0.25.0) into an environment variable.  
-export KUBEVIRT_VERSION=$(curl -s https://api.github.com/repos/kubevirt/kubevirt/releases/latest | jq -r .tag_name)  
-echo $KUBEVIRT_VERSION  
 
-kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-operator.yaml
+`export KUBEVIRT_VERSION=$(curl -s https://api.github.com/repos/kubevirt/kubevirt/releases/latest | jq -r .tag_name)`    
+`echo $KUBEVIRT_VERSION`  
+
+`kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-operator.yaml`
+
+## Create instance of kubevirt Operator  
+With the kubevirt Operator installed, we next need to invoke an instance of kubevirt. After this command is run, seven pods will be created and running in the namespace "kubevirt". At that point, kubevirt is up and running.  
+
+`kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-cr.yaml`  
+
 
 ## Install CDI
+The [Containerized Data Importer](https://github.com/kubevirt/containerized-data-importer), or CDI, must be installed in our kubernetes (OpenShift) cluster in order to upload the Windows VM.  
 
-## Tweak file permissions
+The first step captures the CDI's version number in an environment variable to be used in the two later steps.
+
+`export VERSION=$(curl -s https://github.com/kubevirt/containerized-data-importer/releases/latest | grep -o "v[0-9]\.[0-9]*\.[0-9]*")`  
+
+`kubectl create -f https://github.com/kubevirt/containerized-data-importer/releases/download/$VERSION/cdi-operator.yaml`  
+
+`kubectl create -f https://github.com/kubevirt/containerized-data-importer/releases/download/$VERSION/cdi-cr.yaml`
+
+
+
+
+
+
 
 ## Upload VM images
 
+`virtctl image-upload dv windows --size=50Gi --image-path=Summit2019.raw --insecure
+`
+
 ## Create VM
+
+`oc apply -f vm-windows.yml`
+
+
+## Tweak file permissions
+Here's where things get a bit tricky. Kubevirt was originally intended to run on a bare metal kubernetes installation, and we're using CodeReady Containers -- a VM running kubernetes (and OpenShift). In addition, we'll be using CRC's supplied Persistent Volumes (PV) for our storage. Those PVs don't have the correct permissions for our kubevirt instance, so we need to change the top-level directory's permissions.
+
+/var/run/kubevirt-private/vmi-disks/pvcvolume/disk.img': Permission denied')"
+
+`oc exec virt-launcher-windows-app-server-ckl7r chmod 777 /var/run/kubevirt-private/vmi-disks/pvcvolume`
 
 ## Create Service
 
