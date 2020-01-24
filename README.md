@@ -76,11 +76,11 @@ The [Containerized Data Importer](https://github.com/kubevirt/containerized-data
 
 The first step captures the CDI's version number in an environment variable to be used in the two later steps.
 
-`export VERSION=$(curl -s https://github.com/kubevirt/containerized-data-importer/releases/latest | grep -o "v[0-9]\.[0-9]*\.[0-9]*")`  
+`export CDI_VERSION=$(curl -s https://github.com/kubevirt/containerized-data-importer/releases/latest | grep -o "v[0-9]\.[0-9]*\.[0-9]*")`  
 
-`kubectl create -f https://github.com/kubevirt/containerized-data-importer/releases/download/$VERSION/cdi-operator.yaml`  
+`kubectl create -f https://github.com/kubevirt/containerized-data-importer/releases/download/$CDI_VERSION/cdi-operator.yaml`  
 
-`kubectl create -f https://github.com/kubevirt/containerized-data-importer/releases/download/$VERSION/cdi-cr.yaml`
+`kubectl create -f https://github.com/kubevirt/containerized-data-importer/releases/download/$CDI_VERSION/cdi-cr.yaml`
 
 
 
@@ -90,8 +90,7 @@ The first step captures the CDI's version number in an environment variable to b
 
 ## Upload VM images
 
-`virtctl image-upload dv windows --size=50Gi --image-path=Summit2019.raw --insecure
-`
+`virtctl image-upload dv windows --size=50Gi --image-path=Summit2019.raw --insecure`
 
 ## Create VM
 
@@ -101,16 +100,46 @@ The first step captures the CDI's version number in an environment variable to b
 ## Tweak file permissions
 Here's where things get a bit tricky. Kubevirt was originally intended to run on a bare metal kubernetes installation, and we're using CodeReady Containers -- a VM running kubernetes (and OpenShift). In addition, we'll be using CRC's supplied Persistent Volumes (PV) for our storage. Those PVs don't have the correct permissions for our kubevirt instance, so we need to change the top-level directory's permissions.
 
-/var/run/kubevirt-private/vmi-disks/pvcvolume/disk.img': Permission denied')"
+The error, which appears in the "Events" tab when you view the virtual machine in the OpenShift dashboard, is the following:
 
-`oc exec virt-launcher-windows-app-server-ckl7r chmod 777 /var/run/kubevirt-private/vmi-disks/pvcvolume`
+"(.../var/run/kubevirt-private/vmi-disks/pvcvolume/disk.img': Permission denied')"
 
-## Create Service
+The workaround is to run a command inside the pod that control the virtual machine, a command that will grant access to the VM.  
+
+First, get the pod identifier:
+
+#### IF YOU HAVE AWK INSTALLED ON YOUR PC:  
+`export VM_POD_ID=$(oc get pods | sed -n 2p | awk '{print $1}')`
+`oc exec $VM_POD_ID chmod 777 /var/run/kubevirt-private/vmi-disks/pvcvolume`
+
+
+#### If you DO NOT have AWK installed on your PC:
+
+`oc get pods`
+
+It will follow the pattern of "virt-windows-app-server-______".
+
+Then, use the pod id in the following command:
+
+`oc exec {POD_ID_GOES_HERE} chmod 777 /var/run/kubevirt-private/vmi-disks/pvcvolume`
+
+## Create RDP service
+`virtctl expose virtualmachine windows-app-server --name windows-app-server-rdp --port 3389 --target-port 3389 --type NodePort`
+
+## Log in using RDP
+
+## Create web Service
+
+`virtctl expose virtualmachine windows-app-server --name windows-app-server-web --port 80 --target-port 80 --protocol="TCP"`
 
 ## Create Routes
 
+`oc expose service windows-app-server-web`
+
 ## View web site
 
+## Advanced Section
+The following 
 ## Use web service
 
 ## Install .NET Core service as replacement
