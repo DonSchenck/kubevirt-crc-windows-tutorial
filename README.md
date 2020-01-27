@@ -57,6 +57,10 @@ That will supply you with the proper login information. Log in and set your oper
 
 `eval (crc oc-env)`  
 
+## Create your new project
+
+`oc new-project virtwin`
+
 ## Install kubevirt Operator  
 This first part will get the current version number (e.g. 0.25.0) into an environment variable.  
 
@@ -123,11 +127,23 @@ Then, use the pod id in the following command:
 
 `oc exec {POD_ID_GOES_HERE} chmod 777 /var/run/kubevirt-private/vmi-disks/pvcvolume`
 
+
+## Start the cluster dashboard/console
+
+In another terminal session on the host, launch the OpenShift console in your default browser by running the following command: 
+
+`crc console`  
+
+Log in as user "kubedamin", using the same password that you used to log in at the comand line, earlier.  
+
 ## Create RDP service
 `virtctl expose virtualmachine windows-app-server --name windows-app-server-rdp --port 3389 --target-port 3389 --type NodePort`
 
 ## Log in using RDP
 
+At the OpenShift console, find the virtual machine you created under the "Workload" section, and click on the "console" tab.  
+
+Use the Remote Desktop option.
 ## Create web Service
 
 `virtctl expose virtualmachine windows-app-server --name windows-app-server-web --port 80 --target-port 80 --protocol="TCP"`
@@ -138,6 +154,8 @@ Then, use the pod id in the following command:
 
 ## View web site
 
+Inside the
+
 ## Advanced Section
 The following 
 ## Use web service
@@ -145,3 +163,4 @@ The following
 ## Install .NET Core service as replacement
 
 ## Switch route to .NET Core service
+
