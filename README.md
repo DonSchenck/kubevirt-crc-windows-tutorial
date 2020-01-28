@@ -39,7 +39,7 @@ After CRC has started, there is no reason (yet) to sign in. Immediately stop CRC
 
 `crc stop`
 
-### Resize
+### Resize the VM
 Now, add 75GB to the VM by running the makebig script:  
 
 `./makebig.sh`
@@ -51,15 +51,24 @@ Now we can start CRC and proceed with the tutorial.
 
 `crc start`  
 
-That will supply you with the proper login information. Log in and set your operating environment.
+That will supply you with the proper login information. 
 
+![login info](./images/crc_start_message.png)
+
+Log in and set your operating environment.
+
+## Login...
+ 
 `oc login -u kubeadmin -p your_password_goes_here https://api.crc.testing:6443`  
 
 `eval (crc oc-env)`  
 
-## Create your new project
+## ...and create your new project
 
 `oc new-project virtwin`
+
+![crc login and new project](./images/crc_login.png) 
+
 
 ## Install kubevirt Operator  
 This first part will get the current version number (e.g. 0.25.0) into an environment variable.  
@@ -69,11 +78,14 @@ This first part will get the current version number (e.g. 0.25.0) into an enviro
 
 `kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-operator.yaml`
 
+![install kubevirt operator](./images/install_kubevirt_operator.png)
+
 ## Create instance of kubevirt Operator  
 With the kubevirt Operator installed, we next need to invoke an instance of kubevirt. After this command is run, seven pods will be created and running in the namespace "kubevirt". At that point, kubevirt is up and running.  
 
 `kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-cr.yaml`  
 
+![create instance of kubevirt operator](./images/create_instance_of_kubevirt_operator.png)
 
 ## Install CDI
 The [Containerized Data Importer](https://github.com/kubevirt/containerized-data-importer), or CDI, must be installed in our kubernetes (OpenShift) cluster in order to upload the Windows VM.  
@@ -86,15 +98,13 @@ The first step captures the CDI's version number in an environment variable to b
 
 `kubectl create -f https://github.com/kubevirt/containerized-data-importer/releases/download/$CDI_VERSION/cdi-cr.yaml`
 
+![install cdi](./images/install_cdi.png)
 
-
-
-
-
-
-## Upload VM images
+## Upload VM image
 
 `virtctl image-upload dv windows --size=50Gi --image-path=Summit2019.raw --insecure`
+
+![upload vm image](./images/upload_vm_image.png)
 
 ## Create VM
 
