@@ -61,6 +61,9 @@ Log in and set your operating environment.
  
 `oc login -u kubeadmin -p your_password_goes_here https://api.crc.testing:6443`  
 
+For example, `oc login -u kubeadmin -p cznQP-n4pBk-cnXTg-nkevH https://api.crc.testing:6443`  
+
+## ...set the oc command environment...
 `eval (crc oc-env)`  
 
 ## ...and create your new project
@@ -73,7 +76,8 @@ Log in and set your operating environment.
 ## Install kubevirt Operator  
 This first part will get the current version number (e.g. 0.25.0) into an environment variable.  
 
-`export KUBEVIRT_VERSION=$(curl -s https://api.github.com/repos/kubevirt/kubevirt/releases/latest | jq -r .tag_name)`    
+`export KUBEVIRT_VERSION=$(curl -s https://api.github.com/repos/kubevirt/kubevirt/releases/latest | jq -r .tag_name)`     
+
 `echo $KUBEVIRT_VERSION`  
 
 `kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-operator.yaml`
@@ -137,6 +141,7 @@ Then, use the pod id in the following command:
 
 `oc exec {POD_ID_GOES_HERE} chmod 777 /var/run/kubevirt-private/vmi-disks/pvcvolume`
 
+After running this command, in order to speed things up, you may want to restart the VM.
 
 ## Start the cluster dashboard/console
 
@@ -145,6 +150,9 @@ In another terminal session on the host, launch the OpenShift console in your de
 `crc console`  
 
 Log in as user "kubedamin", using the same password that you used to log in at the comand line, earlier.  
+
+Using the console, you can watch the Windows VM start. Under the "Workloads" section of the menu, select the "Virtual Machines" option. Make sure you are in the project "virtwin", and you can see the VM entitled "windows-app-server" listed.
+
 
 ## Create RDP service
 `virtctl expose virtualmachine windows-app-server --name windows-app-server-rdp --port 3389 --target-port 3389 --type NodePort`
