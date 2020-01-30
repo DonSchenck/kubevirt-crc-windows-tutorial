@@ -151,17 +151,45 @@ In another terminal session on the host, launch the OpenShift console in your de
 
 Log in as user "kubedamin", using the same password that you used to log in at the comand line, earlier.  
 
-Using the console, you can watch the Windows VM start. Under the "Workloads" section of the menu, select the "Virtual Machines" option. Make sure you are in the project "virtwin", and you can see the VM entitled "windows-app-server" listed.
+Using the console, you can watch the Windows VM start.
+
+Under the "Workloads" section of the menu, select the "Virtual Machines" option. Make sure you are in the project "virtwin", and you can see the VM entitled "windows-app-server" listed.
+
+![vm](./images/vm.png)
+
+Click on the VM name (windows-app-server) in order to view the details for the VM. Once there, use the "Consoles" tab to see the VM start.
+
+![vm details](./images/vm_details.png)
+
+![vm_starting](./images/vm_starting.png)
+
+![vm running](./images/vm_running.png)
+
+After the VM has started, you can see that no RDP is available.
+
+![vm no rdp available](./images/vm_no_rdp_available.png)
 
 
-## Create RDP service
+## Create Remote Desktop Protocol (RDP) service
+
 `virtctl expose virtualmachine windows-app-server --name windows-app-server-rdp --port 3389 --target-port 3389 --type NodePort`
+
+![create rdp service](./images/create_rdp_service.png)
+
+After running the command, you can return to the dashboard and see that the RDP function is now available.
+
+![vm rdp available](./images/vm_rdp_available.png)
+
 
 ## Log in using RDP
 
-At the OpenShift console, find the virtual machine you created under the "Workload" section, and click on the "console" tab.  
+Use the Remote Desktop option and sign in to the Windows VM. Note: the password is `Pa$$word`
 
-Use the Remote Desktop option.
+![rdp_prompt](./images/rdp_prompt.png)
+
+### IMPORTANT  
+Note that there appears to be some defect with respect to the RDP function. If you disconnect or log out from the Windows VM, you will need to restart the VM in order to use RDP again.
+
 ## Create web Service
 
 `virtctl expose virtualmachine windows-app-server --name windows-app-server-web --port 80 --target-port 80 --protocol="TCP"`
@@ -172,13 +200,13 @@ Use the Remote Desktop option.
 
 ## View web site
 
-Inside the
+Inside the web dashboard, open the "Networking" section and select the "Routes" option. You will see the route to the web site. Clock on the URL to open the Wingtip Toys web site in your browser.
 
-## Advanced Section
-The following 
-## Use web service
 
-## Install .NET Core service as replacement
+![web route](./images/web_route.png)
 
-## Switch route to .NET Core service
+![wingtip toys website](./images/wingtip_toys_website.png)
 
+## Congratulations
+
+You now have a .NET Frameworks web site, and an instance of MS SQL Server, running on a VM in kubernetes.
