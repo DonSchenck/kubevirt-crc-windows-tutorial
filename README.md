@@ -76,18 +76,32 @@ For example, `oc login -u kubeadmin -p cznQP-n4pBk-cnXTg-nkevH https://api.crc.t
 ## Install kubevirt Operator  
 This first part will get the current version number (e.g. 0.25.0) into an environment variable.  
 
+<div style="font-weight:bold;color:yellow;background-color:black">&nbsp;bash&nbsp;</div>
+
 `export KUBEVIRT_VERSION=$(curl -s https://api.github.com/repos/kubevirt/kubevirt/releases/latest | jq -r .tag_name)`     
 
-`echo $KUBEVIRT_VERSION`  
-
 `kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-operator.yaml`
+
+
+<div style="font-weight:bold;color:white;background-color:blue">&nbsp;PowerShell&nbsp;</div>
+
+`$env:KUBEVIRT_VERSION = (ConvertFrom-Json (curl https://api.github.com/repos/kubevirt/kubevirt/releases/latest).content)[0].tag_name`  
+
+`kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/$env:KUBEVIRT_VERSION/kubevirt-operator.yaml`
+
 
 ![install kubevirt operator](./images/install_kubevirt_operator.png)
 
 ## Create instance of kubevirt Operator  
 With the kubevirt Operator installed, we next need to invoke an instance of kubevirt. After this command is run, seven pods will be created and running in the namespace "kubevirt". At that point, kubevirt is up and running.  
 
+<div style="font-weight:bold;color:yellow;background-color:black">&nbsp;bash&nbsp;</div>  
+
 `kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-cr.yaml`  
+
+<div style="font-weight:bold;color:white;background-color:blue">&nbsp;PowerShell&nbsp;</div>  
+
+ `kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/$env:KUBEVIRT_VERSION/kubevirt-cr.yaml`
 
 ![create instance of kubevirt operator](./images/create_instance_of_kubevirt_operator.png)
 
@@ -96,11 +110,21 @@ The [Containerized Data Importer](https://github.com/kubevirt/containerized-data
 
 The first step captures the CDI's version number in an environment variable to be used in the two later steps.
 
+<div style="font-weight:bold;color:yellow;background-color:black">&nbsp;bash&nbsp;</div>  
+
 `export CDI_VERSION=$(curl -s https://github.com/kubevirt/containerized-data-importer/releases/latest | grep -o "v[0-9]\.[0-9]*\.[0-9]*")`  
 
 `kubectl create -f https://github.com/kubevirt/containerized-data-importer/releases/download/$CDI_VERSION/cdi-operator.yaml`  
 
 `kubectl create -f https://github.com/kubevirt/containerized-data-importer/releases/download/$CDI_VERSION/cdi-cr.yaml`
+
+<div style="font-weight:bold;color:white;background-color:blue">&nbsp;PowerShell&nbsp;</div>  
+ 
+`$env:CDI_VERSION = (curl https://github.com/kubevirt/containerized-data-importer/releases/latest | Select-String "v[0-9]\.[0-9]*\.[0-9]*").matches | select -exp value`
+
+`kubectl create -f https://github.com/kubevirt/containerized-data-importer/releases/download/$env:CDI_VERSION/cdi-operator.yaml`
+
+`kubectl create -f https://github.com/kubevirt/containerized-data-importer/releases/download/$env:CDI_VERSION/cdi-cr.yaml`
 
 ![install cdi](./images/install_cdi.png)
 
